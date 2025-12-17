@@ -49,7 +49,6 @@ cdk bootstrap
 ### Deploy the Stack
 
 ```bash
-cd infrastructure
 cdk deploy
 ```
 
@@ -99,7 +98,6 @@ Response:
 To run the Lambda function locally for testing:
 
 ```bash
-cd lambda
 python -m pytest tests/
 ```
 
@@ -168,7 +166,6 @@ aws logs tail /aws/apigateway/SummarizationApi --follow
 To remove all deployed resources:
 
 ```bash
-cd infrastructure
 cdk destroy
 ```
 

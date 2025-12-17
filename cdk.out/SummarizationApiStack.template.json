@@ -79,7 +79,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-611052934789-us-east-2",
-     "S3Key": "6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f.zip"
+     "S3Key": "3e98a33dcc36d4d900c7efef6789b1f2f8c18984de27c5327b00ef862c94b8f3.zip"
     },
     "DeadLetterConfig": {
      "TargetArn": {
@@ -106,7 +106,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/Resource",
-    "aws:asset:path": "asset.6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f",
+    "aws:asset:path": "asset.3e98a33dcc36d4d900c7efef6789b1f2f8c18984de27c5327b00ef862c94b8f3",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

@@ -13,8 +13,10 @@ def handler(event, context):
     
     try:
         # Parse HTTP request
-        http_method = event['requestContext']['http']['method']
-        path = event['requestContext']['http']['path']
+        http_method = event.get('httpMethod', '')
+        path = event.get('path', '')
+
+        logger.info(f"Http method: {http_method}, Path: {path}")
         
         # Health check endpoint
         if http_method == 'GET' and path == '/health':
