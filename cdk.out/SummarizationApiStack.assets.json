@@ -1,0 +1,36 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f": {
+      "displayName": "SummarizationFunction/Code",
+      "source": {
+        "path": "asset.6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "611052934789-us-east-2-f5a6f9b5": {
+          "bucketName": "cdk-hnb659fds-assets-611052934789-us-east-2",
+          "objectKey": "6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f.zip",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::611052934789:role/cdk-hnb659fds-file-publishing-role-611052934789-us-east-2"
+        }
+      }
+    },
+    "a73c95af278f98a4ba42494369b42d949012a1a52c34eb71756f1dd7a5cb1f5e": {
+      "displayName": "SummarizationApiStack Template",
+      "source": {
+        "path": "SummarizationApiStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "611052934789-us-east-2-162357e8": {
+          "bucketName": "cdk-hnb659fds-assets-611052934789-us-east-2",
+          "objectKey": "a73c95af278f98a4ba42494369b42d949012a1a52c34eb71756f1dd7a5cb1f5e.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::611052934789:role/cdk-hnb659fds-file-publishing-role-611052934789-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

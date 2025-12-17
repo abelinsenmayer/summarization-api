@@ -1,0 +1,378 @@
+{
+ "Resources": {
+  "SummarizationFunctionServiceRole771DF0BF": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/ServiceRole/Resource"
+   }
+  },
+  "SummarizationFunctionServiceRoleDefaultPolicy3301D99D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sqs:SendMessage",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "SummarizationFunctionDeadLetterQueue1159C7B4",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SummarizationFunctionServiceRoleDefaultPolicy3301D99D",
+    "Roles": [
+     {
+      "Ref": "SummarizationFunctionServiceRole771DF0BF"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "SummarizationFunctionDeadLetterQueue1159C7B4": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/DeadLetterQueue/Resource"
+   }
+  },
+  "SummarizationFunctionDBD09568": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-611052934789-us-east-2",
+     "S3Key": "6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f.zip"
+    },
+    "DeadLetterConfig": {
+     "TargetArn": {
+      "Fn::GetAtt": [
+       "SummarizationFunctionDeadLetterQueue1159C7B4",
+       "Arn"
+      ]
+     }
+    },
+    "Handler": "summarization.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "SummarizationFunctionServiceRole771DF0BF",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.9",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "SummarizationFunctionServiceRoleDefaultPolicy3301D99D",
+    "SummarizationFunctionServiceRole771DF0BF"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/Resource",
+    "aws:asset:path": "asset.6a46e84e9a613ce037daa37c5c9d8e06d086c7545869d1df39370135ec24505f",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SummarizationFunctionEventInvokeConfig7D8A1170": {
+   "Type": "AWS::Lambda::EventInvokeConfig",
+   "Properties": {
+    "FunctionName": {
+     "Ref": "SummarizationFunctionDBD09568"
+    },
+    "MaximumRetryAttempts": 2,
+    "Qualifier": "$LATEST"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/EventInvokeConfig/Resource"
+   }
+  },
+  "SummarizationApi29BBA6D4": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "*"
+     ],
+     "AllowMethods": [
+      "POST",
+      "GET"
+     ],
+     "AllowOrigins": [
+      "*"
+     ]
+    },
+    "Description": "API for AI text summarization",
+    "Name": "Summarization API",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/Resource"
+   }
+  },
+  "SummarizationApiDefaultStageABDDEB51": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "SummarizationApi29BBA6D4"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/DefaultStage/Resource"
+   }
+  },
+  "SummarizationApiPOSTsummarizeSummarizeIntegrationE1DA3DE1": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "SummarizationApi29BBA6D4"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "SummarizationFunctionDBD09568",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/POST--summarize/SummarizeIntegration/Resource"
+   }
+  },
+  "SummarizationApiPOSTsummarizeSummarizeIntegrationPermission0833F072": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SummarizationFunctionDBD09568",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-2:611052934789:",
+       {
+        "Ref": "SummarizationApi29BBA6D4"
+       },
+       "/*/*/summarize"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/POST--summarize/SummarizeIntegration-Permission"
+   }
+  },
+  "SummarizationApiPOSTsummarize6C7829C1": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "SummarizationApi29BBA6D4"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /summarize",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "SummarizationApiPOSTsummarizeSummarizeIntegrationE1DA3DE1"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/POST--summarize/Resource"
+   }
+  },
+  "SummarizationApiGEThealthHealthIntegration4C6ECED0": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "SummarizationApi29BBA6D4"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "SummarizationFunctionDBD09568",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/GET--health/HealthIntegration/Resource"
+   }
+  },
+  "SummarizationApiGEThealthHealthIntegrationPermissionE74286C6": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SummarizationFunctionDBD09568",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-2:611052934789:",
+       {
+        "Ref": "SummarizationApi29BBA6D4"
+       },
+       "/*/*/health"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/GET--health/HealthIntegration-Permission"
+   }
+  },
+  "SummarizationApiGEThealth9C6941CD": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "SummarizationApi29BBA6D4"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /health",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "SummarizationApiGEThealthHealthIntegration4C6ECED0"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/SummarizationApi/GET--health/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22P0U7DMAxFv2XvWWDtF2wTiD1Rug+YvMwrXtuk1E6rKsq/o6SCB8TTPfa1r+xCF2Whiw3MvDW3dtvRVYezgGkVzHwJHfTXG+jw6q0RclYd7/aXXya0crKTa/Ho7J2a5P7brHDsiZmcjYqg16F2HSYja+U6MkueyxQVlxdgRmG9T6K41AdvWpQDMCr+Yh0+PPockSEqGKgBwRmWqdDhTWTYD5T8JKk8CzR5YYXUqp2XlU5WsBnh58U/ZZ6LUdXIzo8GVb4q5ZDN/717GbxEVS3y6exTqXc7/bx5MNF29FaoR12v+g2iIFENcQEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "SummarizationApiStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ApiUrl": {
+   "Description": "URL of the Summarization API",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "SummarizationApi29BBA6D4"
+      },
+      ".execute-api.us-east-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
