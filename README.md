@@ -6,7 +6,7 @@ A serverless text summarization API built with AWS Lambda and API Gateway, deplo
 
 - **AWS Lambda**: Serverless compute for the API logic
 - **API Gateway**: RESTful API endpoint with CORS support
-- **Amazon Bedrock**: AI service for text summarization using Anthropic Claude 3.5 Haiku
+- **Amazon Bedrock**: AI service for text summarization
 - **CloudWatch Logs**: Centralized logging and monitoring
 
 ## Prerequisites
