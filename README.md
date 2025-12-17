@@ -6,6 +6,7 @@ A serverless text summarization API built with AWS Lambda and API Gateway, deplo
 
 - **AWS Lambda**: Serverless compute for the API logic
 - **API Gateway**: RESTful API endpoint with CORS support
+- **Amazon Bedrock**: AI service for text summarization using Anthropic Claude 3.5 Haiku
 - **CloudWatch Logs**: Centralized logging and monitoring
 
 ## Prerequisites
@@ -32,11 +33,6 @@ poetry install
 poetry shell
 ```
 
-Or using pip:
-```bash
-pip install -r requirements.txt
-```
-
 ### 3. Configure AWS CDK
 
 If you haven't already, bootstrap AWS CDK:
@@ -53,10 +49,10 @@ cdk deploy
 ```
 
 The deployment will:
-- Create a Lambda function with the placeholder code
+- Create a Lambda function with the summarization logic
 - Set up API Gateway with the `/summarize` and `/health` endpoints
 - Configure logging and monitoring
-- Set up the necessary IAM permissions
+- Set up the necessary IAM permissions including Bedrock runtime access
 
 After deployment, the CDK will output the API URL.
 
@@ -76,20 +72,53 @@ Response:
 }
 ```
 
-### Summarize Endpoint (Placeholder)
+### Summarize Endpoint
 
 ```bash
 curl -X POST https://your-api-id.execute-api.region.amazonaws.com/prod/summarize \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "text": "Your long text to summarize goes here..."
+  }'
 ```
 
 Response:
 ```json
 {
-  "message": "Hello World - Summarization endpoint ready for Bedrock integration"
+  "success": true,
+  "data": {
+    "summary": "The summarized text...",
+    "original_length": 1234,
+    "summary_length": 156
+  }
 }
 ```
+
+#### Request Body
+- `text` (required): The text to be summarized. Maximum length is configurable via the `MAX_TEXT_LENGTH` environment variable (default: 1000 characters).
+
+#### Error Responses
+Missing text field:
+```json
+{
+  "error": "Missing required field: text"
+}
+```
+
+Text exceeds maximum length:
+```json
+{
+  "error": "Text exceeds maximum length of 1000 characters"
+}
+```
+
+#### Bedrock Integration
+The summarization endpoint uses Amazon Bedrock with the following configuration:
+- **Model**: Anthropic Claude 3.5 Haiku (`us.anthropic.claude-3-5-haiku-20241022-v1:0`)
+- **Region**: us-east-1
+- **API**: Bedrock Converse API
+
+The service sends a prompt to Claude requesting a concise and clear summary of the provided text. The response includes the summary along with metadata about the original and summary text lengths.
 
 ## Development
 
@@ -121,15 +150,6 @@ poetry install
 
 Or update `pyproject.toml` manually.
 
-## Future Integration
-
-This API is designed to be integrated with AWS Bedrock for AI summarization. To add Bedrock integration:
-
-1. Update the Lambda function in `lambda/summarization.py`
-2. Add necessary AWS SDK dependencies
-3. Configure IAM permissions for Bedrock access
-4. Update the CDK stack if additional resources are needed
-
 ## Monitoring and Troubleshooting
 
 ### CloudWatch Logs
@@ -144,11 +164,6 @@ View API Gateway logs:
 aws logs tail /aws/apigateway/SummarizationApi --follow
 ```
 
-### Common Issues
-
-1. **500 Internal Error**: Check CloudWatch logs for detailed error messages
-2. **Timeout**: The Lambda has a 5-minute timeout. Adjust as needed for your use case
-
 ## Cost Considerations
 
 - Lambda: Charged per request and execution time
@@ -157,9 +172,10 @@ aws logs tail /aws/apigateway/SummarizationApi --follow
 
 ## Security
 
-- Lambda function has minimal required permissions
+- Lambda function has minimal required permissions including Bedrock runtime access
 - API Gateway has CORS enabled (configure specific origins for production)
 - All traffic is encrypted via HTTPS
+- Input validation prevents abuse (configurable text length limits)
 
 ## Cleanup
 
