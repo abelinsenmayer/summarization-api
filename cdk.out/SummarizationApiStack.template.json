@@ -48,6 +48,11 @@
          "Arn"
         ]
        }
+      },
+      {
+       "Action": "bedrock:InvokeModel",
+       "Effect": "Allow",
+       "Resource": "*"
       }
      ],
      "Version": "2012-10-17"
@@ -79,7 +84,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-611052934789-us-east-2",
-     "S3Key": "3e98a33dcc36d4d900c7efef6789b1f2f8c18984de27c5327b00ef862c94b8f3.zip"
+     "S3Key": "0b8e19e6e8f42301a3f4d42156ec2daa962cbaefef446bcd7d0b69f6f96e125a.zip"
     },
     "DeadLetterConfig": {
      "TargetArn": {
@@ -106,7 +111,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "SummarizationApiStack/SummarizationFunction/Resource",
-    "aws:asset:path": "asset.3e98a33dcc36d4d900c7efef6789b1f2f8c18984de27c5327b00ef862c94b8f3",
+    "aws:asset:path": "asset.0b8e19e6e8f42301a3f4d42156ec2daa962cbaefef446bcd7d0b69f6f96e125a",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

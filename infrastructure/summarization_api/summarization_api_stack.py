@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_apigatewayv2_integrations as apigateway_integrations,
     aws_lambda as _lambda,
     aws_logs as logs,
+    aws_iam as iam,
     Duration,
     RemovalPolicy,
     CfnOutput
@@ -24,6 +25,15 @@ class SummarizationApiStack(Stack):
             memory_size=512,
             dead_letter_queue_enabled=True,
             retry_attempts=2
+        )
+        
+        # Grant permission to invoke Bedrock models
+        summarization_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=['bedrock:InvokeModel'],
+                resources=['*']
+            )
         )
 
         # HTTP API Gateway
